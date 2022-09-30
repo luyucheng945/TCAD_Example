@@ -1,0 +1,47 @@
+;----- Recessed-Gate GaN Hemt -----; 
+;----- (1). parameter -----; 
+(define Thickness_GaNBuffer 2)
+(define Thickness_AlGaNBarrier 0.0156)
+(define Thickness_RecessedGate 0.003)
+(define Thickness_Nitride 0.05)
+(define Width_SDG 3)
+(define Width_BetweenSDG 5)
+(define x1 Width_SDG)
+(define x2 (+ x1 Width_BetweenSDG)) 
+(define x3 (+ x2 Width_SDG))
+(define x4 (+ x3 Width_BetweenSDG))  
+(define x5 (+ x4 Width_SDG))  
+(define y1 Thickness_GaNBuffer) 
+(define y2 (+ Thickness_GaNBuffer Thickness_AlGaNBarrier))
+(define y3 (- y2 Thickness_RecessedGate))
+(define y4 (+ y2 Thickness_Nitride)
+;----- (2). Structure -----; 
+"ABA"
+(sdegeo:create-rectangle (position 0 0 0) (position x5 y1 0) "GaN" "GaN Buffer" )
+(sdegeo:create-polygen (list (position 0 y1 0) (position 0 y2 0)(position x2 y2 0) (position x2 y3 0) (position x3 y3 0) (position x3 y2 0)(position x5 y2 0) (position x5 y1 0)"AlGaN" "AlGaN Barrier" )
+(sdegeo:create-rectangle (position x1 y2 0) (position x2 y4 0) "Si3N4" "NitrideLeft" )
+(sdegeo:create-rectangle (position x3 y2 0) (position x4 y4 0) "Si3N4" "NitrideRight" )
+; ----- (3). Contact -----; 
+(sdegeo:define-contact-set "Source" 4.0 (color:rgb 1.0 0.0 0.0 ) "##") 
+(sdegeo:define-2d-contact (find-edge-id (position (/ x1 2) y2 0)) "Source") 
+(sdegeo:define-2d-contact (find-edge-id (position x1 (+ y2 (/ Thickness_Nitride 2)) 0)) "Source") 
+(sdegeo:define-contact-set "Gate" 4.0 (color:rgb 1.0 0.0 0.0 ) "##") 
+(sdegeo:define-2d-contact (find-edge-id (position (+ x2 (/ Width_SDG 2)) y2 0)) "Gate")
+(sdegeo:define-2d-contact (find-edge-id (position x2 (+ y2 (/ Thickness_Nitride 2)) 0)) "Gate")  
+(sdegeo:define-2d-contact (find-edge-id (position x3 (+ y2 (/ Thickness_Nitride 2)) 0)) "Gate")
+(sdegeo:define-contact-set "Drain" 4.0 (color:rgb 1.0 0.0 0.0 ) "##") 
+(sdegeo:define-2d-contact (find-edge-id (position (+ x4 (/ Width_SDG 2)) y2 0)) "Drain") 
+(sdegeo:define-2d-contact (find-edge-id (position x4 (+ y2 (/ Thickness_Nitride 2)) 0)) "Drain")   
+;----- (4). Mesh -----; 
+;--- AllMesh ---
+(sdedr:define-refinement-size "Cha_Mesh" 20 20 0 10 10 0) 
+(sdedr:define-refinement-material "channel_RF" "Cha_Mesh" "Silicon" )
+;--- ChannelMesh ---
+(sdedr:define-refinement-window "multiboxChannel" "Rectangle" 
+(position 25 (- 50) 0) 
+(position (+ 50 Lg 25) (+ tac 50) 0)) 
+(sdedr:define-multibox-size "multiboxSizeChannel" 5 5 0 1 1 0) 
+(sdedr:define-multibox-placement "multiboxPlacementChannel" 
+"multiboxSizeChannel" "multiboxChannel") 
+(sdedr:define-refinement-function "multiboxPlacementChannel" 
+"DopingConcentration" "MaxTransDiff" 1) 
