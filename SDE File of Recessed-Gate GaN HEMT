@@ -1,7 +1,7 @@
 ;----- Recessed-Gate GaN Hemt -----; 
 ;----- (1). parameter -----; 
 (define Thickness_GaNBuffer 2)
-(define Thickness_AlGaNBarrier 0.0156)
+(define Thickness_AlGaNBarrier 0.016)
 (define Thickness_RecessedGate 0.003)
 (define Thickness_Nitride 0.05)
 (define Width_SDG 3)
@@ -32,16 +32,3 @@
 (sdegeo:define-contact-set "Drain" 4.0 (color:rgb 1.0 0.0 0.0 ) "##") 
 (sdegeo:define-2d-contact (find-edge-id (position (+ x4 (/ Width_SDG 2)) y2 0)) "Drain") 
 (sdegeo:define-2d-contact (find-edge-id (position x4 (+ y2 (/ Thickness_Nitride 2)) 0)) "Drain")   
-;----- (4). Mesh -----; 
-;--- AllMesh ---
-(sdedr:define-refinement-size "Cha_Mesh" 20 20 0 10 10 0) 
-(sdedr:define-refinement-material "channel_RF" "Cha_Mesh" "Silicon" )
-;--- ChannelMesh ---
-(sdedr:define-refinement-window "multiboxChannel" "Rectangle" 
-(position 25 (- 50) 0) 
-(position (+ 50 Lg 25) (+ tac 50) 0)) 
-(sdedr:define-multibox-size "multiboxSizeChannel" 5 5 0 1 1 0) 
-(sdedr:define-multibox-placement "multiboxPlacementChannel" 
-"multiboxSizeChannel" "multiboxChannel") 
-(sdedr:define-refinement-function "multiboxPlacementChannel" 
-"DopingConcentration" "MaxTransDiff" 1) 
