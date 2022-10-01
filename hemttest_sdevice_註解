@@ -1,0 +1,158 @@
+Electrode{
+   { Name="Source"       Voltage= 0.0 }
+   { Name="Drain"        Voltage= 0.0 }
+   { Name="Gate"         Voltage= 0.0 WorkFunction=4.6}
+}
+
+File{
+	Grid= "@tdr@"
+	Parameter= "@parameter@"
+	Current= "@plot@"
+	Plot= "@tdrdat@"
+	Output= "@log@"      
+}
+
+Physics{
+	AreaFactor= 1000 
+	#這在2維模擬中代表第3維的尺寸為1000um	
+
+	EffectiveIntrinsicDensity(Nobandgapnarrowing) 
+	#因為GaN HEMT的摻雜量小，所以不考慮能帶窄化效應
+	#這就是為什麼不用OldSlotboom，因為它主要考慮的是摻雜造成的能帶窄化效應
+
+	Fermi
+	#啟動費米統計學，這是由於HEMT的通道載流子密度非常高，如果不用會導致錯誤結論
+
+	Mobility(DopingDependence HighFieldSaturation) *WhatDoping *Why Enormal
+	#雖然GaN HEMT的摻雜量小，但是摻雜量還是對遷移率的影響較大，所以仍需考慮
+	#Enormal主要是考慮表面粗糙度造成的遷移率降低，對於MOSFET是需要考慮的
+	#對於GaN HEMT，這個現象對Recess Gate結構比較有影響
+	#GaN HEMT在高電壓下才有良好的遷移率，因此要考慮到HighFieldSaturation
+
+	Recombination(SRH)
+	#使用SRH理論考慮缺陷造成的影響
+
+	Piezoelectric_Polarization (strain)
+	#對於GaN材料特重要的壓電極化
+
+	Aniso(Poisson direction=(0, 0, 1))
+	#Aniso是非等向性的意思，意思是第3維度的性質不同於2維模擬的性質
+
+	Thermionic
+	#為了考慮閘極的正向偏壓漏電流，因此使用熱載子發射模型
+
+	DefaultParametersFromFile
+	#使用parameter file內的參數，而非內建參數，因為內建參數是寫給矽的	
+	* Use parameter files within the MaterialDB 
+	* directory to determine defaults.
+}
+
+
+
+Physics (MaterialInterface="AlGaN/Nitride") {
+	Piezoelectric_Polarization(Activation=0.1)
+	#Activation是一個校正用的參數
+
+	Traps((Acceptor Gaussian Conc= 3e13 EnergySig=0.1 EnergyMid= 0.3 FromMidBandGap))
+	#設定AlGaN/Nitride介面上有高斯分布的受體陷阱，高斯分布由參數Conc、EnergySig與EnergyMid決定
+}
+Physics (RegionInterface="GaN_channel/AlGaN_spacer") {
+	Piezoelectric_Polarization(Activation= 1)
+	#Activation是一個校正用的參數
+}
+Physics (Region="GaN_buffer") {
+	Traps ((Acceptor Gaussian Conc= 1e18 EnergySig=0.1 EnergyMid= 0.9 FromValenceBand Add2TotalDoping Name= "t1")
+	# Assume C doping imposes a level ~0.9 eV from Ev (~-0.8 from mid *bandgap)
+	#碳在GaN中可做為施體與受體，摻雜在Buffer中是要讓Buffer成為高阻值區域，降低漏電流
+	#由於碳摻雜於GaN_buffer中這件事沒有在sde檔案中定義，因此要加入考量
+	)
+}
+
+Physics (Region="AlGaN_buffer") {
+	Traps ((Acceptor Gaussian Conc= 1e18 EnergySig=0.1 EnergyMid= 0.9 FromValenceBand Add2TotalDoping Name= "t2"))
+	#碳在AlGaN中可做為施體與受體，摻雜在Buffer中是要讓Buffer成為高阻值區域，降低漏電流
+	#由於碳摻雜於AlGaN_buffer中這件事沒有在sde檔案中定義，因此要加入考量
+ }
+Physics (Region="AlN_buffer") {
+	Traps ((Acceptor Gaussian Conc= 1e19 EnergySig=0.1 EnergyMid= 0.9 FromValenceBand Add2TotalDoping Name= "t3"))
+	#碳在AlN中可做為施體與受體，摻雜在Buffer中是要讓Buffer成為高阻值區域，降低漏電流
+	#由於碳摻雜於AlN_buffer中這件事沒有在sde檔案中定義，因此要加入考量
+
+ 	Piezoelectric_Polarization(Activation= 0)
+	#Activation是一個校正用的參數
+
+}
+Physics (MaterialInterface="AlN/Oxide") {
+	PiezoElectric_Polarization(activation= 0)
+	#Activation是一個校正用的參數
+}
+Plot {
+	Electricfield/Vector
+	eCurrent/Vector hCurrent/Vector TotalCurrent/Vector
+	Temperature 
+	TotalHeat eJouleHeat hJouleHeat 
+	SRH Avalanche
+	eMobility hMobility
+	eGradQuasiFermi hGradQuasiFermi
+	eEparallel hEparallel
+	
+	eVelocity hVelocity
+	DonorConcentration Acceptorconcentration
+	Doping SpaceCharge
+	ConductionBand ValenceBand eQuasiFermiEnergy hQuasiFermiEnergy
+	BandGap Affinity
+	xMoleFraction
+
+	PE_Polarization/Vector
+	PE_Charge
+	ConversePiezoelectricField/Tensor
+	#因為壓電極化很重要，想看壓電極化
+
+#	eBarrierTunneling
+}	#因為GaN HEMT會透過穿隧漏電，想看穿隧
+
+Math{
+	Extrapolate
+	Digits= 8
+	Iterations= 20
+
+	Directcurrent
+	#一種計算接觸電流的數值方法，將電流密度在整個接觸面積曲面積分計算接觸電流
+
+	RHSMin= 1e-8
+	CNormPrint
+	NewtonPlot (Error MinError Residual)
+	#上三式用於讓人可隨時觀察數值方法的誤差
+
+
+  	TensorGridAniso(Aniso)
+	#使用TensorGridAniso對tensor網格進行非等向性模擬的收斂性最好
+
+	eDrForceRefDens= 1e8 
+	hDrForceRefDens= 1e8
+	#DrForceRefDens是驅動力參考載流子密度的意思，主要是進行數值計算用的參數
+	#皆使用正數，目的是改善在小密度區域發生的強生成-複合問題的收斂性
+
+	EquilibriumSolution(Iterations= 1000)
+	#這是要考慮流經電介質的漏電流，作法是將電介質視為有導電特性
+	#為了要解這樣的情況用EquilibriumSolution
+	
+	ExtendedPrecision
+}	#在手冊中建議對於GaN元件使用ExtendedPrecision
+
+Solve{
+    *- Initial Solution:
+    Coupled(Iterations= 10000 LineSearchDamping=1e-4){ Poisson }
+    Coupled(Iterations= 10000 LineSearchDamping=1e-4){ Poisson Electron Hole}
+
+    *- Gate/Drain ramping to IdVg starting point:
+Quasistationary(
+	DoZero
+	InitialStep= 1e-3
+	MaxStep= 1e-2 MinStep= 1e-24
+	Increment= 1.4 Decrement= 2.0
+	Goal{ Name= "Drain" Voltage= 30 }
+){ Coupled {Poisson Electron Hole}	
+	Plot(FilePrefix="n@node@_Vd28" Time=(0.56))
+	Plot(FilePrefix="n@node@_Vd36" Time=(0.72))
+	Plot(FilePrefix="n@node@_Vd48" Time=(0.96))}
