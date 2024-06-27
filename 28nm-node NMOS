@@ -1,0 +1,384 @@
+# 2D nMOSFET (0.18um technology)
+# ------------------------------
+
+# Declare initial grid (half structure)
+# -------------------------------------
+
+line x location= 0.0      spacing= 1.0<nm>  tag= SiTop        
+line x location= 50.0<nm> spacing= 10.0<nm>                    
+line x location= 0.5<um>  spacing= 50.0<nm>                      
+line x location= 2.0<um>  spacing= 0.2<um>                       
+line x location= 4.0<um>  spacing= 0.4<um>                       
+line x location= 10.0<um> spacing= 2.0<um>  tag= SiBottom   
+
+line y location= 0.0      spacing= 50.0<nm> tag= Mid         
+line y location= 0.2<um> spacing=50.0<nm>  tag= Right       
+
+# Silicon substrate definition
+# ----------------------------
+
+region Silicon xlo= SiTop xhi= SiBottom ylo= Mid yhi= Right
+
+# Initialize the simulation
+# -------------------------
+
+init concentration= 1.0e+15<cm-3> field= Phosphorus
+
+AdvancedCalibration 
+
+#split @STI@
+
+## Etch STI
+mask name=STI left=450<nm> right= 150<nm>
+photo mask=STI thickness= 0.3
+strip Photoresist
+
+
+deposit material= {Oxide}   type= anisotropic  thickness= 0.010
+struct tdr= n@node@_NMOS00  ; # STI
+
+deposit material= {Nitride} type= anisotropic thickness= 0.100
+struct tdr= n@node@_NMOS01  ; # STI
+
+mask name=AA left=450<nm> right= 150<nm>
+photo mask=AA thickness= 0.3
+struct tdr= n@node@_NMOS02  ; # STI
+
+etch material= {Nitride} type= anisotropic thickness= 0.120
+struct tdr= n@node@_NMOS03  ; # STI
+
+etch material= {Oxide} type= anisotropic thickness= 0.012
+struct tdr= n@node@_NMOS04  ; # STI
+
+strip Photoresist
+etch material= {Silicon} type= trapezoidal thickness=0.35 angle= 87.0
+struct tdr= n@node@_NMOS05  ; # STI
+
+etch material= {Nitride} type= isotropic thickness= 0.020
+struct tdr= n@node@_NMOS06  ; # STI
+
+diffuse temperature= 900<C> time= 10.0<min>  O2 
+struct tdr= n@node@_NMOS07  ; # STI
+
+deposit material= {Oxide} type= isotropic thickness= 0.2
+struct tdr= n@node@_NMOS08  ; # STI
+
+etch type= cmp coord= -0.09 material= all 
+struct tdr= n@node@_NMOS09 ; # STI
+
+strip Nitride
+struct tdr= n@node@_NMOS10  ; # STI
+
+etch material= {Oxide} thickness= 0.09 type= directional \
+ direction= {1 0}
+struct tdr= n@node@_NMOS11  ; # STI
+
+deposit material= {Oxide} type= isotropic thickness= 0.001 
+struct tdr= n@node@_NMOS12  ; # STI
+## etch oxide isotropic thickness= 0.010
+
+
+
+#split @Well@
+
+# p-well, anti-punchthrough & Vt adjustment implants
+# --------------------------------------------------
+pdbSet ImplantData TS4Backscattering 1
+mask name=Well left=0<nm> right= 150<nm>
+
+photo mask= Well thickness= 0.3
+struct tdr= n@node@_NMOS00  ; # p-Well
+
+implant  Boron  dose= 1.0e14<cm-2>  energy= 180<keV> tilt= 7.0 rotation= 0  
+implant  Boron  dose= 5.0e13<cm-2>  energy= 70<keV> tilt= 7.0 rotation= 0  
+implant  Boron  dose= 1.0e13<cm-2>  energy= 25<keV> tilt= 7.0 rotation= 0  
+
+strip Photoresist
+struct tdr= n@node@_NMOS01  ; # p-Well
+
+# p-well: RTA of channel implants
+# -------------------------------
+
+diffuse temperature= 1050<C> time= 10.0<s>   
+
+# Saving structure
+# ----------------
+
+struct tdr= n@node@_NMOS02  ; # p-Well
+
+
+#split @GateOxide@
+
+
+# Global Mesh settings for automatic meshing in newly generated layers
+# --------------------------------------------------------------------
+
+grid set.min.normal.size= 1<nm> set.normal.growth.ratio.2d= 1.5
+mgoals accuracy= 1e-5
+
+pdbSet Oxide Grid perp.add.dist 1e-7
+pdbSet Grid NativeLayerThickness 1e-7
+
+
+# Gate oxidation
+# --------------
+
+etch material= {Oxide} type= isotropic  rate= {1.0} time= 0.005
+struct tdr= n@node@_NMOS00 ; # GateOx
+
+deposit material= {Oxide} type= isotropic  rate= {1.0} time= 0.004
+struct tdr= n@node@_NMOS01 ; # GateOx
+
+#split @PolyGate@
+
+# Poly gate deposition
+# --------------------
+pdbSet ImplantData TS4Backscattering 1
+
+deposit material= {PolySilicon} type= isotropic time= 1 rate= {0.12}
+struct tdr= n@node@_NMOS00 ; # PolyGate
+
+
+deposit material= {Nitride} type= isotropic thickness= 0.050
+struct tdr= n@node@_NMOS01 ; # PolyGate
+
+# Poly gate pattern/etch
+# ----------------------
+
+mask name= gate_mask left=80<nm> right= 500<nm>
+photo mask= gate_mask thickness= 0.3
+struct tdr= n@node@_NMOS02 ; # PolyGate
+
+etch material= {Nitride} type= anisotropic time= 1 rate= {0.2} 
+struct tdr= n@node@_NMOS03 ; # PolyGate
+
+strip Photoresist
+struct tdr= n@node@_NMOS04 ; # PolyGate
+
+etch material= {PolySilicon} type= anisotropic time= 1 rate= {0.2} 
+struct tdr= n@node@_NMOS05 ; # PolyGate
+
+
+#split @OffsetSpacer@
+
+# Offset Spacer
+# ----------------
+
+
+diffuse temperature= 1050<C> time= 0.2<min>  O2 
+struct tdr= n@node@_NMOS00 ; # OffsetSpacer
+
+deposit material= {Nitride} type= isotropic rate= {1.0} time= 0.005
+struct tdr= n@node@_NMOS01 ; # OffsetSpacer
+
+etch material= {Nitride} type= anisotropic rate= {1.0} time= 0.01 
+struct tdr= n@node@_NMOS02 ; # OffsetSpacer
+#split @LDD@
+
+# LDD implantation & RTA
+# ----------------
+mater add name=IGZO new.like=PolySilicon
+pdbSetBoolean IGZO VariableMassDensity 1
+
+refinebox Silicon min= {0.0 0.04} max= {0.15 0.12} xrefine= {0.005 0.005 0.005} \
+                                                  yrefine= {0.005 0.005 0.005} add
+grid remesh
+
+implant Arsenic dose= 2e12<cm-2> energy= 150<keV> tilt= 45.0<degree> rotation= 0.0  
+diffuse temperature= 1050<C> time= 30<s> ; # Quick activation 
+struct tdr= n@node@_NMOS00 ; # LDD Implant
+
+implant Arsenic dose= 1e13<cm-2> energy= 10<keV> tilt= 45.0<degree> rotation= 0.0  
+diffuse temperature= 1050<C> time= 0.2<s> ; # Quick activation 
+struct tdr= n@node@_NMOS01 ; # LDD Implant
+
+
+#split @Spacer@
+
+# Nitride spacer
+# --------------
+
+deposit material= {Oxide} type= isotropic rate= {1.0} time= 0.005
+struct tdr= n@node@_NMOS00 ; # OffsetSpacer
+
+deposit material= {Nitride} type= isotropic rate= {1.0} time= 0.010
+struct tdr= n@node@_NMOS01 ; # OffsetSpacer
+
+deposit material= {Oxide} type= isotropic rate= {1.0} time= 0.010
+struct tdr= n@node@_NMOS02 ; # OffsetSpacer
+
+etch material= {Oxide} type= anisotropic rate= {1.0} time= 0.05
+struct tdr= n@node@_NMOS03 ; # OffsetSpacer
+
+etch material= {Nitride} type= anisotropic rate= {1.0} time= 0.035
+etch material= {Nitride} type= isotropic rate= {1.0} time= 0.001
+struct tdr= n@node@_NMOS04 ; # OffsetSpacer
+
+etch material= {Oxide} type= anisotropic rate= {1.0} time= 0.015
+etch type= cmp coord= -0.15 material= all 
+struct tdr= n@node@_NMOS05 ; # OffsetSpacer
+
+#split @HDD@
+
+# N+ implantation
+# ---------------
+mater add name=IGZO new.like=PolySilicon
+pdbSetBoolean IGZO VariableMassDensity 1
+
+refinebox Silicon min= {0.04 0.12} max= {0.18 0.4} xrefine= {0.005 0.005 0.005} \
+                                                   yrefine= {0.01 0.01 0.01} add
+grid remesh
+implant Arsenic dose= 1e16<cm-2> energy= 20<keV> \
+        tilt= 7<degree> rotation= -90<degree>  
+
+# N+ implantation & final RTA
+# ---------------------------
+
+diffuse temperature= 1050<C> time= 0.2<s> 
+struct tdr= n@node@_NMOS00 ; # S/D implants
+
+#split @ILD0@
+# ILD0
+# --------
+
+deposit material= {Oxide} type= isotropic thickness= 1<um>
+struct tdr= n@node@_NMOS00 ; # ILD0
+
+etch type= cmp coord= -0.3 material= all 
+struct tdr= n@node@_NMOS01 ; # ILD0
+
+#split @DummyGateRemoval@
+# Dummy Gate Removal
+# ------------------
+etch type= cmp coord= -0.15 material= all 
+struct tdr= n@node@_NMOS00 ; # Dummy Gate Removal
+
+etch material= {Nitride} type= anisotropic time= 1 rate= {0.02} 
+etch material= {Nitride} type= isotropic time= 1 rate= {0.01} 
+struct tdr= n@node@_NMOS01 ; # Dummy Gate Removal
+
+etch material= {PolySilicon} type= isotropic time= 1 rate= {0.3} 
+struct tdr= n@node@_NMOS02 ; # Dummy Gate Removal
+
+
+#split @HKMG@
+# HKMG
+# ------------------
+
+#deposit material= {Oxide} type= isotropic thickness= 0.003<um>
+#struct tdr= n@node@_NMOS00 ; # HKMG
+
+deposit material= {HfO2} type= isotropic thickness= 0.004<um>
+struct tdr= n@node@_NMOS01 ; # HKMG
+
+deposit material= {TiN} type= isotropic thickness= 0.010<um>
+struct tdr= n@node@_NMOS02 ; # HKMG
+
+deposit material= {Tungsten} type= isotropic thickness= 0.080<um>
+struct tdr= n@node@_NMOS03 ; # HKMG
+
+etch type= cmp coord= -0.12 material= all 
+struct tdr= n@node@_NMOS04 ; # HKMG
+
+#split @Contact@
+# Contacts
+# --------
+
+deposit material= {Oxide} type= isotropic thickness= 0.2<um>
+struct tdr= n@node@_NMOS00 ; # Via
+
+etch type= cmp coord= -0.16 material= all 
+struct tdr= n@node@_NMOS01 ; # Via
+
+mask name= Via segments= {0.12 0.145}
+photo mask= Via thickness= 0.3
+struct tdr= n@node@_NMOS02 ; # Via
+
+etch material= { Oxide } type= trapezoidal thickness= 0.2<um> angle= 89
+struct tdr= n@node@_NMOS03 ; # Via
+
+strip Photoresist
+struct tdr= n@node@_NMOS04 ; # Via
+
+deposit material= { Tungsten } type=fill coord= -0.16
+struct tdr= n@node@_NMOS05 ; # Via
+
+#split @Final@
+
+# Reflect
+# -------
+
+refinebox clear
+line clear
+
+
+refinebox min= {-0.02 -0.08} max= {0.02 0.08} xrefine= 0.002 yrefine= 0.002
+
+refinebox min= {-0.02 -0.12} max= {0.1 0.12} xrefine= 0.005 yrefine= 0.005
+
+refinebox min= {-0.02 -0.25} max= {0.3 0.25} xrefine= 0.010 yrefine= 0.010
+
+refinebox min= {-0.16 -0.12} max= {0.0 0.12} xrefine= 0.010 yrefine= 0.010
+
+refinebox Silicon refine.fields= {NetActive} max.asinhdiff= {NetActive=1.0} \
+    refine.min.edge= {0.001 0.001} refine.max.edge= {0.25 0.15}
+
+refinebox offsetting interface.materials= {Silicon} offsetting.maxlevel= 10 
+
+refinebox interface.mat.pairs= {Silicon Oxide} \
+    min.normal.size= 0.001 normal.growth.ratio= 1.5
+
+refinebox interface.mat.pairs= {Silicon Nitride} \
+    min.normal.size= 0.001 normal.growth.ratio= 1.5
+
+refinebox interface.mat.pairs= {Silicon Tungsten} \
+    min.normal.size= 0.001 normal.growth.ratio= 1.5
+
+refinebox IGZO refine.fields= {NetActive} max.asinhdiff= {NetActive=1.0} \
+    refine.min.edge= {0.001 0.001} refine.max.edge= {0.25 0.15}
+
+refinebox offsetting interface.materials= {IGZO} offsetting.maxlevel= 10 
+
+refinebox interface.mat.pairs= {IGZO Oxide} \
+    min.normal.size= 0.001 normal.growth.ratio= 1.5
+
+refinebox interface.mat.pairs= {Silicon IGZO} \
+    min.normal.size= 0.001 normal.growth.ratio= 1.5
+
+refinebox interface.mat.pairs= {Tungsten IGZO} \
+    min.normal.size= 0.001 normal.growth.ratio= 1.5
+
+refinebox offsetting interface.materials= {PolySilicon} offsetting.maxlevel= 10 
+
+refinebox interface.mat.pairs= {Silicon PolySilicon} \
+    min.normal.size= 0.001 normal.growth.ratio= 1.5
+
+grid remesh
+
+transform reflect left 
+
+struct tdr= n@node@_NMOS ; # Final
+contact name="gate" x= -0.03 y= 0.0 replace point Tungsten
+
+contact name="drain" x= -0.05 y= 0.13 replace point Tungsten
+
+contact name="source" x= -0.05 y= -0.13 replace point Tungsten
+
+contact bottom name= "substrate"
+
+struct tdr= n@node@ ; # Final
+
+
+# save final structure:
+#  - 1D cross sections
+
+SetPlxList   {BTotal NetActive}
+WritePlx n@node@_NMOS_channel.plx  y=0.0 Silicon
+
+SetPlxList   {AsTotal BTotal NetActive}
+WritePlx n@node@_NMOS_ldd.plx y=0.1 Silicon
+
+SetPlxList   {AsTotal BTotal NetActive}
+WritePlx n@node@_NMOS_sd.plx y=0.39 Silicon
+
+exit
