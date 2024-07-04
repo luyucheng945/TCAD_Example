@@ -6,9 +6,9 @@ The purpose of this simulation is to simulate the electrical properties of a 1.8
 Reference DOI: 10.1109/IEDM.2009.5424258.
 
 ## Device Structure
-從文獻中可以推得電晶體尺寸，但摻雜分布無法得知，所以摻雜分布是我自己設計的。  
+從文獻中可以推得電晶體尺寸，但摻雜分布無法得知，所以摻雜分布是我自己設計的。考慮了Super Steep Retrograde (SSR) Well、Source/Drain Extension與Source/Drain，沒有考慮Halo/Pocket。  
 
-The dimensions of the transistor can be inferred from the literature, but the doping profile is not known, so I designed the doping profile myself.
+The dimensions of the transistor can be inferred from the literature, but the doping profile is not known, so I designed the doping profile myself. Super Steep Retrograde (SSR) well, Source/Drain Extension and Source/Drain were considered, but Halo/Pocket was not considered.
 ![image](https://github.com/luyucheng945/TCAD/blob/main/Device%20Structure%20of%2032%20nm%20IO%20transistor.png)
 
 ## Physical Model
