@@ -6,6 +6,10 @@
 從文獻中可以推斷出元件大概的尺寸，但摻雜分布無法得知，所以摻雜分布是我自己設計的。
 ![image](https://github.com/luyucheng945/TCAD/blob/main/Device%20Structure%20of%2032%20nm%20IO%20transistor.png)
 
+## 物理模型
+考慮量子校正、本徵載子濃度校正、低場遷移率、高場遷移率校正、SRH複合、BTBT穿隧與Impact ionization效應。
+其中，低場遷移率包含基本的聲子散射、庫倫散射、表面粗糙度散射(由IALMob模型描述)與High-K Metal Gate的遠距聲子散射、遠距庫倫散射、遠距偶極子散射。
+
 ## 模擬結果
 
 | |Lch (nm)|EOT (nm)|Vdd (V)|Idsat (mA/um)|Ioff (nA/um)|
