@@ -13,6 +13,7 @@
 ## 模擬結果
 
 | |Lch (nm)|EOT (nm)|Vdd (V)|Idsat (mA/um)|Ioff (nA/um)|
+| -- | -- | -- | -- | -- | -- |
 |Literature|170|4|1.8|0.68|0.1|
 |Simulation|170|4|1.8|0.54|4.6|
 
