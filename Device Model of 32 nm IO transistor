@@ -1,0 +1,111 @@
+;-----------------------------------------------------------------------------
+Copyright (c) 2024 Yu-Cheng Lu from National Yang Ming Chiao Tung University (NYCU) 
+All Rights Reserved.
+
+This code is used to simulate the Device Structure of 32 nm IO transistor.
+;-----------------------------------------------------------------------------
+
+File{
+  Grid      = "@tdr@"
+  Plot      = "@tdrdat@"
+  Parameter = "@parameter@"
+  Current   = "@plot@"
+  Output    = "@log@"
+}
+
+Electrode{
+  { Name="drain"     Voltage=0.0 }   
+  { Name="source"    Voltage=0.0 }
+  { Name="gate"      Voltage=0.0 Workfunction=4.1 }
+  { Name="substrate" Voltage=0.0 }
+}
+
+
+Physics {Fermi}
+
+Physics (Material="Silicon"){
+  eQuantumPotential(density)
+  EffectiveIntrinsicDensity( OldSlotboom )     
+  Mobility(
+    HighFieldsaturation( GradQuasiFermi )
+    Enormal(
+	IALMob(PhononCombination=2)
+	Lombardi_highk     # Used for remote phonon scattering (RPS)
+	NegInterfaceCharge (SurfaceName="S1")  # Used for remote Coulomb scattering (RCS) and remote dipole scattering (RDS)
+	PosInterfaceCharge (SurfaceName="S1")  # Used for RCS and RDS
+	)
+  )
+  Recombination(
+    SRH( DopingDep )
+    Band2Band(Model= NonLocalPath)
+    Avalanche( GradQuasiFermi )
+  )
+}
+
+Plot{
+  eDensity hDensity
+  TotalCurrent/Vector eCurrent/Vector hCurrent/Vector
+  eMobility hMobility
+  eVelocity hVelocity
+  eQuasiFermi hQuasiFermi
+  eTemperature hTemperature Temperature 
+  ElectricField/Vector Potential SpaceCharge
+  Doping DonorConcentration AcceptorConcentration
+  SRH Band2Band 
+  AvalancheGeneration eAvalancheGeneration hAvalancheGeneration
+  eGradQuasiFermi/Vector hGradQuasiFermi/Vector
+  eEparallel hEparallel eENormal hENormal
+  BandGap 
+  BandGapNarrowing
+  Affinity
+  ConductionBand ValenceBand
+  eBarrierTunneling hBarrierTunneling * BarrierTunneling
+  eTrappedCharge  hTrappedCharge
+  eGapStatesRecombination hGapStatesRecombination
+  eDirectTunnel hDirectTunnel
+
+}
+
+Math {
+  Extrapolate
+  Derivatives
+  RelErrControl
+  Digits= 5  
+  Notdamped= 100
+  Iterations= 25
+  ExitOnFailure
+  TensorGridAniso
+  *StressMobilityDependence = TensorFactor
+  * Please uncomment if you have 4 CPUs or more
+  *Number_of_Threads= 4
+  ElementVolumeAvalanche	
+  Surface "S1" (
+  MaterialInterface= "HfO2/Oxide" 
+  )  
+  
+}
+
+Solve {
+*- Creating initial guess:
+   Coupled(Iterations= 1000 LineSearchDamping= 1e-4){ Poisson eQuantumPotential } 
+   Coupled { Poisson eQuantumPotential Electron }
+
+*- Ramp to drain to Vd
+   Quasistationary( 
+      InitialStep= 1e-2 Increment= 1.35 
+      MinStep= 1e-5 MaxStep= 0.2 
+      Goal { Name="drain" Voltage=!(puts [expr @Vdlin@])! } 
+   ){ Coupled { Poisson eQuantumPotential Electron } } 
+
+
+*- Vg sweep 
+   NewCurrentPrefix="IdVg_" 
+   Quasistationary( 
+      DoZero 
+      InitialStep= 1e-3 Increment= 1.5 
+      MinStep= 1e-5 MaxStep= 0.04
+      Goal { Name="gate" Voltage=!(puts [expr @Vdd@])! } 
+   ){ Coupled { Poisson eQuantumPotential Electron } 
+      CurrentPlot( Time=(Range=(0 1) Intervals= 100)  )
+   }
+}
