@@ -4,7 +4,7 @@
 
 ## 元件結構
 從文獻中可以推斷出元件大概的尺寸，但摻雜分布無法得知，所以摻雜分布是我自己設計的。
-
+![image]([Device Structure of 32 nm IO transistor.png](https://github.com/luyucheng945/TCAD/blob/main/Device%20Structure%20of%2032%20nm%20IO%20transistor.png))
 
 ## 模擬結果
 
