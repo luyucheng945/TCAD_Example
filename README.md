@@ -25,8 +25,7 @@ Consider quantum correction, intrinsic carrier concentration correction, low fie
 
 結果顯示，模擬出來的I<sub>dsat</sub>比文獻低了20%，I<sub>off</sub>比文獻高了450%。
 I<sub>dsat</sub>低估的原因可能是沒有對通道考慮拉伸應力，從而低估電子遷移率。
-I<sub>off</sub>高估的原因可能是摻雜分布設計不良，導致BTBT，造成漏電流。  
-模擬的V<sub>th</sub>、SS與DIBL在合理範圍內，崩潰電壓V<sub>BV</sub>可接受。
+I<sub>off</sub>高估的原因可能是摻雜分布設計不良，導致BTBT，造成漏電流。模擬的V<sub>th</sub>、SS與DIBL在合理範圍內，崩潰電壓V<sub>BV</sub>可接受。  
 
 The results show that the simulated I<sub>dsat</sub> is 20% lower than the literature, and the I<sub>off</sub> is 450% higher than the literature.
 The reason for I<sub>dsat</sub>'s underestimation may be that tensile stress is not considered for the channel, thereby underestimating the electron mobility.
