@@ -1,4 +1,9 @@
-;----------------------------------------------------------------------
+;-----------------------------------------------------------------------------
+Copyright (c) 2024 Yu-Cheng Lu from National Yang Ming Chiao Tung University (NYCU) 
+All Rights Reserved.
+
+This device model is calibrated based on TEM of Intel 32 nm I/O transistor.
+;-----------------------------------------------------------------------------
 (sde:clear)
 ; Setting parameters
 ; - lateral
