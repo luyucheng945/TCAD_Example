@@ -15,9 +15,8 @@ This device model is calibrated based on TEM of Intel 32 nm I/O transistor.
 (define Hsub 1.0)   ; [um] Substrate thickness
 (define Tox  36e-4) ; [um] Gate oxide thickness
 (define Thfo2 20e-4); [um] HfO2 thickness
-(define Hpol 0.050)   ; [um] Poly gate thickness
+(define Hpol 0.050)   ; [um] Gate Height
 
-; - other
 ;   - spacer rounding
 (define fillet-radius 0.08) ; [um] Rounding radius
 
