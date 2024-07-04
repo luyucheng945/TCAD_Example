@@ -18,7 +18,7 @@ The dimensions of the transistor can be inferred from the literature, but the do
 Consider quantum correction, intrinsic carrier concentration correction, low field mobility, high field mobility correction, SRH recombination, BTBT tunneling and Impact ionization effects. Among them, low-field mobility includes basic phonon scattering, Coulomb scattering, surface roughness scattering and High-K Metal Gate's remote phonon scattering, remote Coulomb scattering, and remote dipole scattering.
 ## Simulation Results
 
-| |Lch (nm)|EOT (nm)|Vdd (V)|Idsat (mA/um)|Ioff (nA/um)|Vth (V)|SS (mV/dec)|DIBL (mV/V)|V_BV (V)|
+| |Lch (nm)|EOT (nm)|Vdd (V)|Idsat (mA/um)|Ioff (nA/um)|Vth (V)|SS (mV/dec)|DIBL (mV/V)|V<sub>BV</sub> (V)|
 | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
 |Literature|170|4|1.8|0.68|0.1|- |- | - | - |
 |Simulation|170|4|1.8|0.54|4.6|0.4 |88 |21 |3.0 |
@@ -26,10 +26,10 @@ Consider quantum correction, intrinsic carrier concentration correction, low fie
 結果顯示，模擬出來的Idsat比文獻低了20%，Ioff比文獻高了450%。
 Idsat低估的原因可能是沒有對通道考慮拉伸應力，從而低估電子遷移率。
 Ioff高估的原因可能是摻雜分布設計不良，導致BTBT，造成漏電流。  
-模擬的Vth、SS與DIBL在合理範圍內，崩潰電壓V_BV可接受。
+模擬的Vth、SS與DIBL在合理範圍內，崩潰電壓V<sub>BV</sub>可接受。
 
 The results show that the simulated Idsat is 20% lower than the literature, and the Ioff is 450% higher than the literature.
 The reason for Idsat's underestimation may be that tensile stress is not considered for the channel, thereby underestimating the electron mobility.
 The reason for the overestimation of Ioff may be poor doping distribution design, resulting in BTBT, resulting in leakage current.
-The simulated Vth, SS and DIBL are within a reasonable range, and the breakdown voltage V_BV is acceptable.
+The simulated Vth, SS and DIBL are within a reasonable range, and the breakdown voltage V<sub>BV</sub> is acceptable.
 
