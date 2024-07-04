@@ -12,7 +12,7 @@ The dimensions of the transistor can be inferred from the literature, but the do
 ![image](https://github.com/luyucheng945/TCAD/blob/main/Device%20Structure%20of%2032%20nm%20IO%20transistor.png)
 
 ## Physical Model
-考慮量子校正、本徵載子濃度校正、低場遷移率、高場遷移率校正、SRH複合、BTBT穿隧與Impact ionization效應。
+考慮量子校正、本徵載子濃度校正(Bandgap Narrowing)、低場遷移率模型、高場遷移率模型、SRH複合模型、BTBT穿隧模型與Impact ionization模型。
 其中，低場遷移率包含基本的聲子散射、庫倫散射、表面粗糙度散射與High-K Metal Gate的遠距聲子散射、遠距庫倫散射、遠距偶極子散射。  
 
 Consider quantum correction, intrinsic carrier concentration correction, low field mobility, high field mobility correction, SRH recombination, BTBT tunneling and Impact ionization effects. Among them, low-field mobility includes basic phonon scattering, Coulomb scattering, surface roughness scattering and High-K Metal Gate's remote phonon scattering, remote Coulomb scattering, and remote dipole scattering.
